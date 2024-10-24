@@ -1,4 +1,5 @@
 import sys
+import requests 
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtWidgets import *
 
@@ -44,15 +45,23 @@ class Form(QtWidgets.QMainWindow):
 
         # Damos opciones a los botones del QMessageBox.question
         if confirmacion == QMessageBox.StandardButton.Yes:
-            QMessageBox.information(self, "Datos confirmados", "¡Gracias por rellenar el formulario!.")
+            QMessageBox.information(self, "Datos confirmados", "¡Gracias por rellenar el formulario!")
             self.close()  # Cierra el formulario si los datos son correctos
         else:
             QMessageBox.warning(self, "Datos incorrectos", "Corrige tus datos.")
             return
-        
+
         print(mensaje) # Imprimimos los datos por pantalla
         self.close() # Cerramos el formulario
- 
+
+        # Declaramos los datos del bot de telegram
+        token = 'tu_token'
+        chat_id = 'tu_chat_id' 
+        url = f'https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={mensaje}'
+        # Activamos la url para enviar el mensaje
+        r = requests.get(url)
+
+
 # Clase del diálogo personalizado
 class CustomDialog(QDialog):
     def __init__(self, parent=None):
@@ -70,19 +79,18 @@ class CustomDialog(QDialog):
         #Creo un Layout para meter el dialogo dentro
         layout = QVBoxLayout()
         message = QLabel("¿Seguro que deseas rellenar el formulario?")
-        message.setObjectName('nom_plan_label')
         layout.addWidget(message)
         layout.addWidget(self.buttonBox)
         self.setLayout(layout)
     
     # Funcion de Cancel del dialogo
     def alerta(self):
-        QMessageBox.warning(self, "Recogida de datos", "¡Hasta la próxima!")
+        QMessageBox.warning(self, "Formulario cancelado.", "¡Hasta la próxima!")
         self.close()
  
     # Funcion de Ok del dialogo
     def form(self):
-        QMessageBox.information(self, "Recogida de datos", "Los datos no se usarán para ninguna actividad ilegal.")
+        QMessageBox.information(self, "Importante", "Los datos no se usarán para ninguna actividad ilegal.")
         self.close()
         self.parent().setEnabled(False)  # Deshabilitar la ventana principal
         self.formulario = Form() 
@@ -96,7 +104,7 @@ class Ventana(QMainWindow):
         super().__init__()
         self.setWindowTitle("Recogida de datos")
  
-        button = QPushButton("Formulario") #Botón para entrar al dialogo
+        button = QPushButton("Formulario.") #Botón para entrar al dialogo
         button.setCheckable(True)
         button.clicked.connect(self.click) #Conecta el botón con su función
         self.setCentralWidget(button)
