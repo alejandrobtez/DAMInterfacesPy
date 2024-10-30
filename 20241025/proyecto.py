@@ -90,12 +90,26 @@ class CustomDialog(QDialog):
  
     # Funcion de Ok del dialogo
     def form(self):
-        QMessageBox.information(self, "Importante", "Los datos no se usarán para ninguna actividad ilegal.")
-        self.close()
-        self.parent().setEnabled(False)  # Deshabilitar la ventana principal
-        self.formulario = Form() 
-        self.formulario.show() # Muestra la clase Form
-        self.formulario.destroyed.connect(lambda: self.parent().setEnabled(True))  # Rehabilitar al cerrar
+        
+        # Confirmamos que el usuario es mayor de edad
+        edad = QMessageBox.question(self,"Edad","¿Eres mayor de edad?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        # Damos opciones a los botones del QMessageBox.question
+        # Funcion del yes, abre el formulario
+        if edad == QMessageBox.StandardButton.Yes:
+            QMessageBox.information(self, "Importante", "Los datos no se usarán para ninguna actividad ilegal.")
+            self.close()  # Cierra el QMessage
+            self.parent().setEnabled(False)  # Deshabilitar la ventana principal
+            self.formulario = Form() 
+            self.formulario.show() # Muestra la clase Form
+            self.formulario.destroyed.connect(lambda: self.parent().setEnabled(True))  # Rehabilitar al cerrar
+
+        # Función del No
+        else:
+            QMessageBox.critical(self, "Prohibido", "Acceso permitido para mayores de edad.")
+            self.close() #Cierra el QMessage
 
 #Clase de la ventana principal
 class Ventana(QMainWindow):
